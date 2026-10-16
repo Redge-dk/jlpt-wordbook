@@ -25,15 +25,9 @@ button:focus-visible, a:focus-visible, select:focus-visible, [role="button"]:foc
 a { color: var(--green); text-underline-offset: 4px; }
 svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 .svg-definitions { position: absolute; width: 0; height: 0; overflow: hidden; }
-.app-header { max-width: 1120px; margin: 0 auto; padding: max(26px, env(safe-area-inset-top)) 30px 23px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
-.brand { display: flex; gap: 13px; align-items: center; text-decoration: none; }
-.brand-mark { background: var(--green); color: #fffef5; border-radius: 12px; width: 45px; height: 45px; display: grid; place-items: center; }
-.brand-mark svg { width: 27px; height: 27px; }
-.brand-name { font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; font-weight: 600; font-size: 24px; letter-spacing: .08em; line-height: 1.2; }
-.brand-name span { display: block; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 10px; letter-spacing: .04em; font-weight: 400; color: var(--muted); margin-top: 5px; }
 .icon-button { border: 1px solid transparent; border-radius: 50%; width: 44px; height: 44px; display: grid; place-items: center; background: transparent; color: #788475; }
 .icon-button:hover { background: #e6eadf; color: var(--green); }
-.app-main { width: min(100% - 48px, 680px); margin: 0 auto; padding: 20px 0 max(22px, env(safe-area-inset-bottom)); }
+.app-main { width: min(100% - 48px, 680px); margin: 0 auto; padding: max(20px, env(safe-area-inset-top)) 0 max(22px, env(safe-area-inset-bottom)); }
 .eyebrow { font-size: 11px; letter-spacing: .11em; color: #7a846f; display: inline-flex; align-items: center; gap: 7px; }
 .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 23px; }
 .filter-wrap { position: relative; max-width: 45%; }
@@ -69,6 +63,16 @@ progress::-moz-progress-bar { background: #829775; }
 .meanings span + span::before { content: '·'; color: #acb39f; margin: 0 10px; }
 .answer { visibility: hidden; opacity: 0; }
 .is-revealed .answer { visibility: visible; opacity: 1; transition: opacity .2s; }
+.examples-section { padding-bottom: 8px; }
+.examples-toggle { display: block; margin: 0 auto; padding: 0 14px; border: 1px solid #dce5d2; border-radius: 8px; background: #f1f5e9; font-size: 12px; }
+.examples-toggle[aria-expanded="true"] { background: transparent; }
+.examples-list { margin: 14px 0 4px; padding: 0; list-style: none; }
+.examples-list li { padding: 14px 0; border-top: 1px solid #e6eadf; overflow-wrap: anywhere; }
+.example-ja { margin: 0; font-size: 16px; line-height: 1.85; }
+.example-en { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+.example-ja, .example-en { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; cursor: text; }
+.example-source { display: inline-flex; align-items: center; min-height: 32px; font-size: 10px; color: #7c8478; }
+.example-translate { display: inline-flex; align-items: center; min-height: 44px; margin-left: 16px; font-size: 12px; }
 .card-action-area { height: 79px; display: grid; align-items: center; padding-bottom: 14px; }
 .reveal-hint { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 11px; color: #8f9784; margin: 0; }
 .tap-dot { width: 16px; height: 19px; border: 1px solid #a8b39a; border-radius: 7px 7px 5px 5px; position: relative; }
@@ -80,8 +84,6 @@ progress::-moz-progress-bar { background: #829775; }
 .flag-button[aria-pressed="true"] { background: #eaf0df; border-color: #9bab84; color: #456334; font-weight: 600; }
 .flag-button[aria-pressed="true"] svg { background: #6d8957; border-color: #6d8957; stroke: white; }
 .flag-button:hover { border-color: #acba9b; }
-.card-bottomline { border-top: 1px solid #edf0e5; display: flex; align-items: center; justify-content: space-between; gap: 9px; min-height: 44px; color: #9ca38f; font-size: 10px; }
-.card-bottomline > span:last-child { white-space: nowrap; font-family: "Hiragino Mincho ProN", serif; font-size: 11px; letter-spacing: .08em; }
 .card-navigation { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 22px; }
 .previous-button { display: flex; align-items: center; gap: 6px; background: transparent; border: 1px solid #d8dfd0; border-radius: 9px; font-size: 12px; min-width: 90px; justify-content: center; }
 .previous-button svg { transform: rotate(180deg); width: 18px; }
@@ -93,6 +95,7 @@ progress::-moz-progress-bar { background: #829775; }
 kbd { font-family: inherit; font-size: 9px; border: 1px solid #d8dfcd; border-radius: 4px; padding: 2px 5px; color: #89967a; }
 .save-note { text-align: center; font-size: 10px; color: #99a18e; margin: 17px 0 0; line-height: 1.6; }
 .app-footer { margin-top: 37px; padding-top: 19px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; align-items: center; font-size: 10px; color: #9aA28e; }
+.footer-about { padding: 0; border: 0; background: transparent; font-size: inherit; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
 .offline-status { font-size: 9px; text-align: right; max-width: 56%; line-height: 1.5; }
 .offline-status.is-ready::before { content: ''; width: 5px; height: 5px; background: #8da274; border-radius: 50%; display: inline-block; margin-right: 5px; }
 .message-card { background: var(--card); border: 1px solid var(--line); border-radius: 19px; padding: 58px 25px; min-height: 421px; text-align: center; display: flex; align-items: center; flex-direction: column; justify-content: center; }
@@ -111,12 +114,7 @@ dialog p { font-size: 12px; line-height: 1.9; color: #73806e; word-break: keep-a
 .load-message { text-align: center; color: var(--muted); padding: 100px 10px; font-size: 13px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 600px) {
-  .app-header { padding: max(17px, env(safe-area-inset-top)) 22px 17px; }
-  .brand-mark { width: 38px; height: 38px; border-radius: 10px; }
-  .brand-mark svg { width: 23px; height: 23px; }
-  .brand-name { font-size: 21px; }
-  .brand-name span { font-size: 9px; margin-top: 4px; }
-  .app-main { width: calc(100% - 36px); padding-top: 14px; }
+  .app-main { width: calc(100% - 36px); padding-top: max(14px, env(safe-area-inset-top)); }
   .eyebrow { font-size: 10px; }
   .toolbar { gap: 7px; margin-bottom: 16px; }
   .mode-switch { padding: 3px; }
@@ -134,8 +132,7 @@ dialog p { font-size: 12px; line-height: 1.9; color: #73806e; word-break: keep-a
   .card-action-area { height: 75px; padding-bottom: 12px; }
   .flags { gap: 8px; }
   .flag-button { font-size: 11px; }
-  .card-bottomline { font-size: 9px; min-height: 43px; }
-  .card-bottomline > span:last-child { display: none; }
+  .example-ja { font-size: 14px; }
   .keyboard-hint { display: none; }
   .card-navigation { margin-top: 18px; }
   .previous-button { min-width: 83px; }
@@ -145,8 +142,7 @@ dialog p { font-size: 12px; line-height: 1.9; color: #73806e; word-break: keep-a
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } }
 @media (max-width: 600px) and (max-height: 760px) {
-  .app-header { padding-top: max(11px, env(safe-area-inset-top)); padding-bottom: 11px; }
-  .app-main { padding-top: 12px; }
+  .app-main { padding-top: max(12px, env(safe-area-inset-top)); }
   .toolbar { margin-bottom: 12px; }
   .progress-row { margin-bottom: 8px; }
   progress { margin-bottom: 12px; }
@@ -157,7 +153,6 @@ dialog p { font-size: 12px; line-height: 1.9; color: #73806e; word-break: keep-a
   .word-long { font-size: clamp(22px, 4.8vw, 40px); }
   .meanings { min-height: 65px; font-size: 13px; }
   .card-action-area { height: 62px; padding-bottom: 8px; }
-  .card-bottomline { min-height: 34px; }
   .card-navigation { margin-top: 14px; }
   .save-note { margin-top: 11px; }
   .app-footer { margin-top: 18px; padding-top: 14px; }

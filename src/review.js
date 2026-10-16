@@ -37,6 +37,7 @@ export function createState(cards, saved = {}) {
     cards, records, mode, filter, level, deck,
     index: Math.max(0, deck.findIndex(({ id }) => id === saved?.currentId)),
     revealed: mode === 'browse',
+    examplesOpen: mode === 'browse',
     complete: false,
   };
 }
@@ -46,11 +47,17 @@ export function currentCard(state) {
 }
 
 export function reveal(state) {
-  return currentCard(state) && !state.complete ? { ...state, revealed: true } : state;
+  return currentCard(state) && !state.complete && !state.revealed
+    ? { ...state, revealed: true, examplesOpen: true } : state;
+}
+
+export function toggleExamples(state) {
+  return currentCard(state)?.examples?.length && !state.complete
+    ? { ...state, examplesOpen: !state.examplesOpen } : state;
 }
 
 export function setMode(state, mode) {
-  return MODES.has(mode) ? { ...state, mode, revealed: mode === 'browse' } : state;
+  return MODES.has(mode) ? { ...state, mode, revealed: mode === 'browse', examplesOpen: mode === 'browse' } : state;
 }
 
 export function setFilter(state, filter) {
@@ -60,6 +67,7 @@ export function setFilter(state, filter) {
     // Freeze this round's membership so clearing a flag cannot remove the card mid-review.
     deck: selectDeck(state.cards, state.records, filter, state.level),
     index: 0, complete: false, revealed: state.mode === 'browse',
+    examplesOpen: state.mode === 'browse',
   };
 }
 
@@ -69,6 +77,7 @@ export function setLevel(state, level) {
     ...state, level,
     deck: selectDeck(state.cards, state.records, state.filter, level),
     index: 0, complete: false, revealed: state.mode === 'browse',
+    examplesOpen: state.mode === 'browse',
   };
 }
 
@@ -85,7 +94,7 @@ export function toggleFlag(state, kind) {
 export function nextCard(state) {
   if (!currentCard(state) || state.complete) return state;
   if (state.index === state.deck.length - 1) return { ...state, complete: true };
-  return { ...state, index: state.index + 1, revealed: state.mode === 'browse' };
+  return { ...state, index: state.index + 1, revealed: state.mode === 'browse', examplesOpen: state.mode === 'browse' };
 }
 
 export function previousCard(state) {
@@ -94,6 +103,7 @@ export function previousCard(state) {
     ...state, complete: false,
     index: state.complete ? state.index : state.index - 1,
     revealed: state.mode === 'browse',
+    examplesOpen: state.mode === 'browse',
   };
 }
 

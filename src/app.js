@@ -1,4 +1,4 @@
-import { createState, currentCard, nextCard, previousCard, reveal, setFilter, setLevel, setMode, summary, toggleFlag, serialize } from './review.js';
+import { createState, currentCard, nextCard, previousCard, reveal, setFilter, setLevel, setMode, summary, toggleExamples, toggleFlag, serialize } from './review.js';
 import { loadSaved, saveReview } from './storage.js';
 
 const $ = id => document.getElementById(id);
@@ -70,6 +70,7 @@ function render() {
     return item;
   }));
   $('word-card').classList.toggle('is-revealed', state.revealed);
+  $('meanings').hidden = !state.revealed;
   for (const id of ['reading', 'meanings']) $(id).setAttribute('aria-hidden', String(!state.revealed));
   $('reveal').setAttribute('aria-expanded', String(state.revealed));
   $('reveal').setAttribute('aria-label', state.revealed ? `${card.word}. ${card.reading}. ${card.meanings.join(', ')}` : `${card.word}. 읽는 법과 뜻 보기`);
@@ -77,7 +78,40 @@ function render() {
   $('flags').hidden = !state.revealed;
   $('reveal-hint').hidden = state.revealed;
   $('card-prompt').textContent = state.revealed ? '얼마나 기억났나요?' : '기억을 천천히 꺼내 보세요';
-  $('card-footnote').textContent = '단어를 길게 누르면 선택해서 복사할 수 있어요.';
+  const examples = card.examples ?? [];
+  $('examples-section').hidden = examples.length === 0;
+  $('examples-toggle').textContent = state.examplesOpen ? '예문 접기' : '예문 보기';
+  $('examples-toggle').setAttribute('aria-expanded', String(state.examplesOpen && examples.length > 0));
+  $('examples-list').hidden = !state.examplesOpen || examples.length === 0;
+  $('examples-list').replaceChildren(...examples.map(example => {
+    const item = document.createElement('li');
+    const japanese = document.createElement('p');
+    japanese.className = 'example-ja';
+    japanese.lang = 'ja';
+    japanese.textContent = example.ja;
+    const translation = document.createElement('p');
+    translation.className = 'example-en';
+    translation.lang = 'en';
+    translation.textContent = example.en;
+    translation.hidden = !state.revealed;
+    const attribution = document.createElement('a');
+    attribution.className = 'example-source';
+    attribution.textContent = 'Tatoeba ↗';
+    attribution.href = `https://tatoeba.org/sentences/show/${example.tatoeba_id}`;
+    attribution.target = '_blank';
+    attribution.rel = 'noopener noreferrer';
+    attribution.setAttribute('aria-label', 'Tatoeba에서 예문과 작성자 보기 (새 탭)');
+    attribution.hidden = !Number.isSafeInteger(example.tatoeba_id) || example.tatoeba_id <= 0;
+    const papago = document.createElement('a');
+    papago.className = 'example-translate';
+    papago.textContent = '파파고 번역 ↗';
+    papago.href = `https://papago.naver.com/?sk=ja&tk=ko&st=${encodeURIComponent(example.ja)}`;
+    papago.target = '_blank';
+    papago.rel = 'noopener noreferrer';
+    papago.setAttribute('aria-label', '이 예문을 파파고에서 일본어에서 한국어로 번역 (새 탭)');
+    item.replaceChildren(japanese, translation, attribution, papago);
+    return item;
+  }));
   $('flag-meaning').setAttribute('aria-pressed', String(record.meaning === true));
   $('flag-reading').setAttribute('aria-pressed', String(record.reading === true));
   $('flag-unknown').setAttribute('aria-pressed', String(record.unknown === true));
@@ -86,6 +120,7 @@ function render() {
 }
 
 function attachEvents() {
+  $('examples-toggle').addEventListener('click', () => update(toggleExamples(state)));
   $('reveal').addEventListener('click', () => {
     if (state.revealed || window.getSelection()?.isCollapsed === false) return;
     update(reveal(state), `${currentCard(state).reading}. ${currentCard(state).meanings.join(', ')}`);

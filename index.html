@@ -19,18 +19,9 @@
       <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5.5C9.2 3.8 5.5 3.5 2.5 4.5v14c3-1 6.7-.7 9.5 1 2.8-1.7 6.5-2 9.5-1v-14c-3-1-6.7-.7-9.5 1Zm0 0v14"/></symbol>
       <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7M3 12h13"/></symbol>
       <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
-      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/></symbol>
       <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
       <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></symbol>
     </svg>
-
-    <header class="app-header">
-      <a class="brand" href="./" aria-label="ことば 단어장 처음 화면">
-        <span class="brand-mark"><svg><use href="#i-book"/></svg></span>
-        <span class="brand-name" lang="ja">ことば<span>나의 일본어 단어장</span></span>
-      </a>
-      <button class="icon-button" id="about-button" aria-label="단어장 정보 및 사용 방법"><svg><use href="#i-info"/></svg></button>
-    </header>
 
     <main class="app-main">
       <p id="load-message" class="load-message" role="status">단어장을 펼치고 있어요…</p>
@@ -76,8 +67,12 @@
           <div role="button" tabindex="0" class="reveal-surface" id="reveal" aria-expanded="false" aria-label="읽는 법과 뜻 보기">
             <span class="reading answer" id="reading" lang="ja" aria-hidden="true"></span>
             <span class="word" id="word" lang="ja"></span>
-            <span class="meanings answer" id="meanings" aria-hidden="true"></span>
+            <span class="meanings answer" id="meanings" aria-hidden="true" hidden></span>
           </div>
+          <section class="examples-section" id="examples-section" aria-label="단어 예문" hidden>
+            <button type="button" class="examples-toggle" id="examples-toggle" aria-expanded="false" aria-controls="examples-list">예문 보기</button>
+            <ol class="examples-list" id="examples-list" hidden></ol>
+          </section>
           <div class="card-action-area">
             <p id="reveal-hint" class="reveal-hint"><span class="tap-dot" aria-hidden="true"></span> 카드를 탭해서 답을 확인하세요</p>
             <div id="flags" class="flags" aria-label="복습 표시" hidden>
@@ -86,7 +81,6 @@
               <button type="button" id="flag-unknown" class="flag-button" aria-pressed="false"><svg><use href="#i-check"/></svg><span>모르겠음</span></button>
             </div>
           </div>
-          <div class="card-bottomline"><span id="card-footnote">생각나지 않으면 바로 확인해도 괜찮아요.</span><span aria-hidden="true">ひとつずつ</span></div>
         </article>
 
         <section class="message-card" id="empty-state" hidden aria-labelledby="empty-title">
@@ -113,7 +107,7 @@
         <p class="save-note" id="save-note">복습 표시는 이 브라우저에 저장돼요.</p>
       </section>
 
-      <footer class="app-footer"><span>조금씩, 다시 익숙해지는 말들.</span><span class="offline-status" id="offline-status" role="status">오프라인 준비 확인 중</span></footer>
+      <footer class="app-footer"><button type="button" class="footer-about" id="about-button">사용 방법·출처</button><span class="offline-status" id="offline-status" role="status">오프라인 준비 확인 중</span></footer>
     </main>
 
     <dialog id="about-dialog" aria-labelledby="about-title">
@@ -122,6 +116,8 @@
       <p id="dataset-info"></p>
       <p>카드 위의 급수 메뉴에서 전체 급수 또는 N1~N5 중 하나를 고를 수 있어요. 급수와 헷갈림·모르겠음 필터를 함께 적용하며, 카드 왼쪽 위에는 현재 단어의 급수가 표시돼요.</p>
       <p>단어를 떠올린 뒤 카드를 탭해 답을 확인하세요. 뜻과 읽기의 헷갈림은 따로 표시할 수 있어요. 단어 자체가 낯설고 뜻과 읽는 법이 모두 기억나지 않으면 ‘모르겠음’을 표시하세요. 표시 없이 넘긴 단어를 외운 단어로 처리하지 않아요.</p>
+      <p>‘예문 보기’를 누르면 답을 공개하지 않고 일본어 예문을 볼 수 있어요. 답을 공개하거나 ‘모두 펼쳐 보기’를 선택하면 예문과 원본 영어 번역도 함께 보여요. 예문이 없는 단어에는 버튼이 표시되지 않아요.</p>
+      <p>예문도 길게 눌러 선택·복사할 수 있어요. 각 예문의 ‘파파고 번역’을 누르면 일본어 문장이 입력된 파파고를 새 탭에서 열어요. 파파고 번역에는 인터넷 연결이 필요해요.</p>
       <p>단어를 길게 누르면 선택해서 복사할 수 있어요. 카드 위의 ‘네이버 사전’을 누르면 현재 단어를 새 탭에서 검색해요. 사전 검색에는 인터넷 연결이 필요해요.</p>
       <h3>iPhone에서 사용하기</h3>
       <p>HTTPS 주소로 접속한 뒤 Safari의 공유 메뉴에서 ‘홈 화면에 추가’를 선택하세요. ‘오프라인 사용 준비 완료’가 표시되면 저장된 단어로 인터넷 없이 복습할 수 있어요.</p>
