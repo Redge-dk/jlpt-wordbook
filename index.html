@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f3f3ed">
+    <meta name="description" content="한 번 알았던 일본어 단어를 다시 떠올리는 나만의 단어장.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>ことば — 나의 일본어 단어장</title>
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="stylesheet" href="./src/style.css">
+    <script type="module" src="./src/app.js"></script>
+  </head>
+  <body>
+    <svg class="svg-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5.5C9.2 3.8 5.5 3.5 2.5 4.5v14c3-1 6.7-.7 9.5 1 2.8-1.7 6.5-2 9.5-1v-14c-3-1-6.7-.7-9.5 1Zm0 0v14"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7M3 12h13"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></symbol>
+    </svg>
+
+    <header class="app-header">
+      <a class="brand" href="./" aria-label="ことば 단어장 처음 화면">
+        <span class="brand-mark"><svg><use href="#i-book"/></svg></span>
+        <span class="brand-name" lang="ja">ことば<span>나의 일본어 단어장</span></span>
+      </a>
+      <button class="icon-button" id="about-button" aria-label="단어장 정보 및 사용 방법"><svg><use href="#i-info"/></svg></button>
+    </header>
+
+    <main class="app-main">
+      <p id="load-message" class="load-message" role="status">단어장을 펼치고 있어요…</p>
+      <noscript><p>카드 복습을 사용하려면 브라우저에서 JavaScript를 켜 주세요.</p></noscript>
+
+      <section id="review-app" aria-label="단어 복습" hidden>
+        <div class="toolbar">
+          <div class="filter-wrap">
+            <label class="sr-only" for="filter">복습할 단어</label>
+            <select id="filter">
+              <option value="all">전체 단어</option>
+              <option value="marked">표시한 단어</option>
+              <option value="meaning">뜻이 헷갈린 단어</option>
+              <option value="reading">읽기가 헷갈린 단어</option>
+              <option value="unknown">모르는 단어</option>
+            </select>
+          </div>
+          <div class="mode-switch" role="group" aria-label="카드 보기 방식">
+            <button id="mode-recall" type="button" aria-pressed="true">기억 확인</button>
+            <button id="mode-browse" type="button" aria-pressed="false">모두 펼쳐 보기</button>
+          </div>
+        </div>
+
+        <div class="progress-row">
+          <span id="deck-label">나의 N1 단어장</span>
+          <span class="counter"><strong id="position">01</strong><span> / </span><span id="total">—</span></span>
+        </div>
+        <progress id="progress" max="1" value="0" aria-label="현재 카드 위치"></progress>
+
+        <article class="word-card" id="word-card">
+          <div class="card-topline"><span class="level-tag">N1</span><span id="card-prompt">기억을 천천히 꺼내 보세요</span><a class="dictionary-link" id="dictionary-link" target="_blank" rel="noopener noreferrer">네이버 사전 ↗</a></div>
+          <div role="button" tabindex="0" class="reveal-surface" id="reveal" aria-expanded="false" aria-label="읽는 법과 뜻 보기">
+            <span class="reading answer" id="reading" lang="ja" aria-hidden="true"></span>
+            <span class="word" id="word" lang="ja"></span>
+            <span class="meanings answer" id="meanings" aria-hidden="true"></span>
+          </div>
+          <div class="card-action-area">
+            <p id="reveal-hint" class="reveal-hint"><span class="tap-dot" aria-hidden="true"></span> 카드를 탭해서 답을 확인하세요</p>
+            <div id="flags" class="flags" aria-label="복습 표시" hidden>
+              <button type="button" id="flag-meaning" class="flag-button" aria-pressed="false"><svg><use href="#i-check"/></svg><span>뜻이 헷갈림</span></button>
+              <button type="button" id="flag-reading" class="flag-button" aria-pressed="false"><svg><use href="#i-check"/></svg><span>읽기가 헷갈림</span></button>
+              <button type="button" id="flag-unknown" class="flag-button" aria-pressed="false"><svg><use href="#i-check"/></svg><span>모르겠음</span></button>
+            </div>
+          </div>
+          <div class="card-bottomline"><span id="card-footnote">생각나지 않으면 바로 확인해도 괜찮아요.</span><span aria-hidden="true">ひとつずつ</span></div>
+        </article>
+
+        <section class="message-card" id="empty-state" hidden aria-labelledby="empty-title">
+          <span class="message-icon"><svg><use href="#i-book"/></svg></span>
+          <h2 id="empty-title" tabindex="-1">해당하는 단어가 없어요</h2>
+          <p>헷갈리는 부분이나 모르는 단어를 표시하면<br>여기서 모아 볼 수 있어요.</p>
+          <button type="button" class="primary-button" id="empty-all">전체 단어 보기 <svg><use href="#i-arrow"/></svg></button>
+        </section>
+
+        <section class="message-card" id="complete-state" hidden aria-labelledby="complete-title">
+          <span class="message-icon"><svg><use href="#i-spark"/></svg></span>
+          <p class="eyebrow">작은 복습 하나를 마쳤어요</p>
+          <h2 id="complete-title" tabindex="-1">한 바퀴 살펴봤어요.</h2>
+          <p id="complete-detail"></p>
+          <button type="button" class="primary-button" id="review-marked">표시한 단어 복습 <svg><use href="#i-arrow"/></svg></button>
+          <button type="button" class="text-button" id="restart">처음부터 다시 보기</button>
+        </section>
+
+        <nav class="card-navigation" aria-label="카드 이동" id="navigation">
+          <button type="button" class="previous-button" id="previous"><svg><use href="#i-arrow"/></svg> 이전</button>
+          <span class="keyboard-hint"><kbd>Space</kbd> 답 보기 <span>·</span> <kbd>←</kbd><kbd>→</kbd> 이동</span>
+          <button type="button" class="next-button" id="next"><span>다음 단어</span><svg><use href="#i-arrow"/></svg></button>
+        </nav>
+        <p class="save-note" id="save-note">복습 표시는 이 브라우저에 저장돼요.</p>
+      </section>
+
+      <footer class="app-footer"><span>조금씩, 다시 익숙해지는 말들.</span><span class="offline-status" id="offline-status" role="status">오프라인 준비 확인 중</span></footer>
+    </main>
+
+    <dialog id="about-dialog" aria-labelledby="about-title">
+      <div class="dialog-heading"><span class="eyebrow">나의 단어장</span><button class="icon-button" id="close-about" aria-label="정보 닫기"><svg><use href="#i-close"/></svg></button></div>
+      <h2 id="about-title">반가워요, 다시 만난 단어.</h2>
+      <p id="dataset-info"></p>
+      <p>단어를 떠올린 뒤 카드를 탭해 답을 확인하세요. 뜻과 읽기의 헷갈림은 따로 표시할 수 있어요. 단어 자체가 낯설고 뜻과 읽는 법이 모두 기억나지 않으면 ‘모르겠음’을 표시하세요. 표시 없이 넘긴 단어를 외운 단어로 처리하지 않아요.</p>
+      <p>단어를 길게 누르면 선택해서 복사할 수 있어요. 카드 위의 ‘네이버 사전’을 누르면 현재 단어를 새 탭에서 검색해요. 사전 검색에는 인터넷 연결이 필요해요.</p>
+      <h3>iPhone에서 사용하기</h3>
+      <p>HTTPS 주소로 접속한 뒤 Safari의 공유 메뉴에서 ‘홈 화면에 추가’를 선택하세요. ‘오프라인 사용 준비 완료’가 표시되면 저장된 단어로 인터넷 없이 복습할 수 있어요.</p>
+      <p>복습 기록은 현재 브라우저에 저장돼요. 사이트 데이터를 삭제하면 기록도 지워지며, 다른 기기로 자동 동기화되지는 않아요.</p>
+      <h3>단어 데이터 출처</h3>
+      <p>OpenJLPT · JMdict / KANJIDIC2 (EDRDG) · Jonathan Waller · Tatoeba. 한국어 뜻은 핵심 의미를 확인해 별도로 작성했어요. JLPT 급수는 학습용 비공식 분류예요.</p>
+      <div class="source-links"><a href="./data/NOTICE.md" target="_blank" rel="noopener">출처 고지</a><a href="./data/LICENSE" target="_blank" rel="noopener">CC BY-SA 4.0</a></div>
+    </dialog>
+    <p class="sr-only" aria-live="polite" id="announcement"></p>
+  </body>
+</html>

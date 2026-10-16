@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>최신 단어장 열기</title>
+  <p id="status" role="status">복습 기록을 유지하면서 최신 화면을 열고 있어요…</p>
+  <script>
+    (async () => {
+      const status = document.getElementById('status');
+      const home = new URL('./', location.href);
+      if (!['localhost', '127.0.0.1', '[::1]'].includes(home.hostname)) {
+        status.textContent = '로컬 개발 화면에서 사용하는 주소예요.';
+        return;
+      }
+      try {
+        const workerUrl = new URL('sw.js', home).href;
+        const registrations = await navigator.serviceWorker?.getRegistrations() ?? [];
+        for (const registration of registrations) {
+          const ownWorker = [registration.active, registration.waiting, registration.installing]
+            .some(worker => worker?.scriptURL === workerUrl);
+          if (registration.scope === home.href && ownWorker) await registration.unregister();
+        }
+        const prefix = 'jlpt-wordbook-app-' + encodeURIComponent(home.pathname) + '-';
+        if ('caches' in window) {
+          for (const name of await caches.keys()) {
+            if (name.startsWith(prefix)) await caches.delete(name);
+          }
+        }
+        location.replace(new URL('?dev=1', home).href);
+      } catch {
+        status.textContent = '화면 갱신을 마치지 못했어요. 단어장 탭을 닫고 이 주소를 다시 열어 주세요.';
+      }
+    })();
+  </script>
+</html>
