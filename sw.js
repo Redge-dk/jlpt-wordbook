@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'jlpt-wordbook-app-' + encodeURIComponent(new URL(self.registration.scope).pathname) + '-';
-const CACHE_NAME = CACHE_PREFIX + 'fb58622a2fb0b74a';
+const CACHE_NAME = CACHE_PREFIX + '5bd347d122970d9d';
 const PRECACHE_FILES = ["index.html","src/app.js","src/review.js","src/storage.js","src/style.css","data/cards.json","data/NOTICE.md","data/LICENSE","manifest.webmanifest","icon.svg","icon-192.png","icon-512.png"];
 const assetUrls = PRECACHE_FILES.map(path => new URL(path, self.registration.scope).href);
 const home = new URL('index.html', self.registration.scope).href;

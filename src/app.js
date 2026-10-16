@@ -13,8 +13,8 @@ function announce(message) {
 function persist() {
   const saved = saveReview(storage, serialize(state));
   $('save-note').textContent = saved
-    ? '복습 표시는 이 브라우저에 저장돼요.'
-    : '이 브라우저에서 저장할 수 없어, 지금 창에서만 기록이 유지돼요.';
+    ? '복습 기록과 학습 순서는 이 브라우저에 저장돼요.'
+    : '이 브라우저에서 저장할 수 없어, 지금 창에서만 기록과 순서가 유지돼요.';
 }
 
 function update(nextState, message) {
@@ -47,6 +47,7 @@ function render() {
   $('complete-state').hidden = !complete;
   $('navigation').hidden = empty || complete;
   if (complete) {
+    $('restart').textContent = state.filter === 'all' ? '새 순서로 한 바퀴 더' : '처음부터 다시 보기';
     $('complete-detail').textContent = counts.marked
       ? `뜻이 헷갈린 단어 ${counts.meaning}개, 읽기가 헷갈린 단어 ${counts.reading}개, 모르는 단어 ${counts.unknown}개가 있어요. 표시한 단어를 다시 만나볼까요?`
       : '표시한 단어는 없어요. 다음에도 가볍게 한 장씩 만나봐요.';
@@ -94,29 +95,33 @@ function render() {
     translation.lang = 'en';
     translation.textContent = example.en;
     translation.hidden = !state.revealed;
-    const attribution = document.createElement('a');
-    attribution.className = 'example-source';
-    attribution.textContent = 'Tatoeba ↗';
-    attribution.href = `https://tatoeba.org/sentences/show/${example.tatoeba_id}`;
-    attribution.target = '_blank';
-    attribution.rel = 'noopener noreferrer';
-    attribution.setAttribute('aria-label', 'Tatoeba에서 예문과 작성자 보기 (새 탭)');
-    attribution.hidden = !Number.isSafeInteger(example.tatoeba_id) || example.tatoeba_id <= 0;
     const papago = document.createElement('a');
     papago.className = 'example-translate';
-    papago.textContent = '파파고 번역 ↗';
     papago.href = `https://papago.naver.com/?sk=ja&tk=ko&st=${encodeURIComponent(example.ja)}`;
     papago.target = '_blank';
     papago.rel = 'noopener noreferrer';
+    papago.title = '파파고 번역';
     papago.setAttribute('aria-label', '이 예문을 파파고에서 일본어에서 한국어로 번역 (새 탭)');
-    item.replaceChildren(japanese, translation, attribution, papago);
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('aria-hidden', 'true');
+    const symbol = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    symbol.setAttribute('href', '#i-translate');
+    icon.replaceChildren(symbol);
+    papago.replaceChildren(icon);
+    const sentence = document.createElement('div');
+    sentence.className = 'example-ja-row';
+    sentence.replaceChildren(japanese, papago);
+    item.replaceChildren(sentence, translation);
     return item;
   }));
   $('flag-meaning').setAttribute('aria-pressed', String(record.meaning === true));
   $('flag-reading').setAttribute('aria-pressed', String(record.reading === true));
   $('flag-unknown').setAttribute('aria-pressed', String(record.unknown === true));
   $('previous').disabled = state.index === 0;
-  $('next').querySelector('span').textContent = state.index === state.deck.length - 1 ? '복습 마치기' : '다음 단어';
+  const nextLabel = state.index === state.deck.length - 1 ? '복습 마치기' : '다음 단어';
+  $('next').querySelector('span').textContent = nextLabel;
+  $('next').setAttribute('aria-label', nextLabel);
+  $('next').title = nextLabel;
 }
 
 function attachEvents() {
@@ -212,8 +217,9 @@ async function start() {
     if (!Array.isArray(data.cards) || data.cards.length === 0) throw new Error('No reviewed vocabulary.');
     const restored = loadSaved(storage);
     state = createState(data.cards, restored.saved);
+    if (restored.available) persist();
     $('dataset-info').textContent = `OpenJLPT N1~N5 목록 전체 ${data.cards.length.toLocaleString('ko-KR')}개 단어가 들어 있어요. 짧은 한국어 핵심 뜻으로 복습하고, 자세한 용법은 카드의 사전 버튼으로 확인할 수 있어요.`;
-    if (!restored.available) $('save-note').textContent = '저장된 기록을 읽을 수 없어요. 지금 창에서는 복습할 수 있어요.';
+    if (!restored.available) $('save-note').textContent = '저장된 기록과 순서를 읽을 수 없어요. 지금 창에서는 복습할 수 있어요.';
     $('load-message').hidden = true;
     $('review-app').hidden = false;
     attachEvents();

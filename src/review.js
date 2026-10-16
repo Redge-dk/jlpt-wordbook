@@ -27,19 +27,90 @@ function selectDeck(cards, records, filter, level) {
   });
 }
 
-export function createState(cards, saved = {}) {
+function shuffled(values, random) {
+  const result = [...values];
+  for (let index = result.length - 1; index > 0; index--) {
+    const other = Math.floor(random() * (index + 1));
+    [result[index], result[other]] = [result[other], result[index]];
+  }
+  return result;
+}
+
+function prepareRound(cards, saved, random, firstId = null) {
+  const available = new Set(cards.map(card => card.id));
+  const seen = new Set();
+  const order = [];
+  for (const id of Array.isArray(saved?.order) ? saved.order : []) {
+    if (!available.has(id) || seen.has(id)) continue;
+    seen.add(id);
+    order.push(id);
+  }
+  // When upgrading an older save, start the new round with the word already on screen.
+  if (!order.length && available.has(firstId)) {
+    order.push(firstId);
+    seen.add(firstId);
+  }
+  const added = shuffled(cards.filter(card => !seen.has(card.id)).map(card => card.id), random);
+  order.push(...added);
+  const complete = saved?.complete === true && added.length === 0 && order.length > 0;
+  const currentId = complete ? order.at(-1)
+    : saved?.complete === true && added.length ? added[0]
+    : available.has(saved?.currentId) ? saved.currentId
+    : order[0] ?? null;
+  return { order, currentId, complete };
+}
+
+function activateRound(state, level, random, restart = false) {
+  const cards = selectDeck(state.cards, state.records, 'all', level);
+  const round = restart ? prepareRound(cards, null, random)
+    : state.rounds[level] ?? prepareRound(cards, null, random);
+  const byId = new Map(cards.map(card => [card.id, card]));
+  return {
+    ...state, level, filter: 'all',
+    rounds: { ...state.rounds, [level]: round },
+    deck: round.order.map(id => byId.get(id)),
+    index: Math.max(0, round.order.indexOf(round.currentId)), complete: round.complete,
+    revealed: state.mode === 'browse', examplesOpen: state.mode === 'browse',
+  };
+}
+
+function rememberPosition(state) {
+  if (state.filter !== 'all') return state;
+  return {
+    ...state,
+    rounds: {
+      ...state.rounds,
+      [state.level]: {
+        ...state.rounds[state.level],
+        currentId: currentCard(state)?.id ?? null, complete: state.complete,
+      },
+    },
+  };
+}
+
+export function createState(cards, saved = {}, random = Math.random) {
   const mode = MODES.has(saved?.mode) ? saved.mode : 'recall';
   const filter = FILTERS.has(saved?.filter) ? saved.filter : 'all';
   const level = LEVELS.has(saved?.level) ? saved.level : 'all';
   const records = cleanRecords(saved?.records);
+  const rounds = {};
+  for (const scope of LEVELS) {
+    const savedRound = saved?.rounds?.[scope];
+    if (!Array.isArray(savedRound?.order)) continue;
+    rounds[scope] = prepareRound(selectDeck(cards, records, 'all', scope), savedRound, random);
+  }
+  if (filter === 'all' && !rounds[level]) {
+    rounds[level] = prepareRound(selectDeck(cards, records, 'all', level), null, random, saved?.currentId);
+  }
   const deck = selectDeck(cards, records, filter, level);
-  return {
-    cards, records, mode, filter, level, deck,
+  const state = {
+    cards, records, mode, filter, level, deck, rounds,
     index: Math.max(0, deck.findIndex(({ id }) => id === saved?.currentId)),
     revealed: mode === 'browse',
     examplesOpen: mode === 'browse',
     complete: false,
   };
+  return filter === 'all' ? activateRound(state, level, random) : state;
 }
 
 export function currentCard(state) {
@@ -60,8 +131,9 @@ export function setMode(state, mode) {
   return MODES.has(mode) ? { ...state, mode, revealed: mode === 'browse', examplesOpen: mode === 'browse' } : state;
 }
 
-export function setFilter(state, filter) {
+export function setFilter(state, filter, random = Math.random) {
   if (!FILTERS.has(filter)) return state;
+  if (filter === 'all') return activateRound(state, state.level, random, state.filter === 'all' && state.complete);
   return {
     ...state, filter,
     // Freeze this round's membership so clearing a flag cannot remove the card mid-review.
@@ -71,8 +143,9 @@ export function setFilter(state, filter) {
   };
 }
 
-export function setLevel(state, level) {
+export function setLevel(state, level, random = Math.random) {
   if (!LEVELS.has(level)) return state;
+  if (state.filter === 'all') return activateRound(state, level, random);
   return {
     ...state, level,
     deck: selectDeck(state.cards, state.records, state.filter, level),
@@ -93,18 +166,18 @@ export function toggleFlag(state, kind) {
 
 export function nextCard(state) {
   if (!currentCard(state) || state.complete) return state;
-  if (state.index === state.deck.length - 1) return { ...state, complete: true };
-  return { ...state, index: state.index + 1, revealed: state.mode === 'browse', examplesOpen: state.mode === 'browse' };
+  if (state.index === state.deck.length - 1) return rememberPosition({ ...state, complete: true });
+  return rememberPosition({ ...state, index: state.index + 1, revealed: state.mode === 'browse', examplesOpen: state.mode === 'browse' });
 }
 
 export function previousCard(state) {
   if (!currentCard(state) || (!state.complete && state.index === 0)) return state;
-  return {
+  return rememberPosition({
     ...state, complete: false,
     index: state.complete ? state.index : state.index - 1,
     revealed: state.mode === 'browse',
     examplesOpen: state.mode === 'browse',
-  };
+  });
 }
 
 export function summary(state) {
@@ -124,5 +197,6 @@ export function serialize(state) {
     version: 1, mode: state.mode, filter: state.filter, level: state.level,
     currentId: currentCard(state)?.id ?? null,
     records: state.records,
+    rounds: state.rounds,
   };
 }
