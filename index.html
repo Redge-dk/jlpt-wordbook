@@ -55,13 +55,24 @@
         </div>
 
         <div class="progress-row">
-          <span id="deck-label">나의 N1 단어장</span>
+          <div class="filter-wrap level-filter-wrap">
+            <label class="sr-only" for="level">복습할 급수</label>
+            <select id="level">
+              <option value="all">전체 급수</option>
+              <option value="N1">N1</option>
+              <option value="N2">N2</option>
+              <option value="N3">N3</option>
+              <option value="N4">N4</option>
+              <option value="N5">N5</option>
+            </select>
+          </div>
+          <span id="deck-label" class="sr-only">나의 일본어 단어장</span>
           <span class="counter"><strong id="position">01</strong><span> / </span><span id="total">—</span></span>
         </div>
         <progress id="progress" max="1" value="0" aria-label="현재 카드 위치"></progress>
 
         <article class="word-card" id="word-card">
-          <div class="card-topline"><span class="level-tag">N1</span><span id="card-prompt">기억을 천천히 꺼내 보세요</span><a class="dictionary-link" id="dictionary-link" target="_blank" rel="noopener noreferrer">네이버 사전 ↗</a></div>
+          <div class="card-topline"><span class="level-tag" id="level-tag">—</span><span id="card-prompt">기억을 천천히 꺼내 보세요</span><a class="dictionary-link" id="dictionary-link" target="_blank" rel="noopener noreferrer">네이버 사전 ↗</a></div>
           <div role="button" tabindex="0" class="reveal-surface" id="reveal" aria-expanded="false" aria-label="읽는 법과 뜻 보기">
             <span class="reading answer" id="reading" lang="ja" aria-hidden="true"></span>
             <span class="word" id="word" lang="ja"></span>
@@ -109,6 +120,7 @@
       <div class="dialog-heading"><span class="eyebrow">나의 단어장</span><button class="icon-button" id="close-about" aria-label="정보 닫기"><svg><use href="#i-close"/></svg></button></div>
       <h2 id="about-title">반가워요, 다시 만난 단어.</h2>
       <p id="dataset-info"></p>
+      <p>카드 위의 급수 메뉴에서 전체 급수 또는 N1~N5 중 하나를 고를 수 있어요. 급수와 헷갈림·모르겠음 필터를 함께 적용하며, 카드 왼쪽 위에는 현재 단어의 급수가 표시돼요.</p>
       <p>단어를 떠올린 뒤 카드를 탭해 답을 확인하세요. 뜻과 읽기의 헷갈림은 따로 표시할 수 있어요. 단어 자체가 낯설고 뜻과 읽는 법이 모두 기억나지 않으면 ‘모르겠음’을 표시하세요. 표시 없이 넘긴 단어를 외운 단어로 처리하지 않아요.</p>
       <p>단어를 길게 누르면 선택해서 복사할 수 있어요. 카드 위의 ‘네이버 사전’을 누르면 현재 단어를 새 탭에서 검색해요. 사전 검색에는 인터넷 연결이 필요해요.</p>
       <h3>iPhone에서 사용하기</h3>

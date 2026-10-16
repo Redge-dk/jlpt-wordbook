@@ -1,5 +1,6 @@
 const FILTERS = new Set(['all', 'marked', 'meaning', 'reading', 'unknown']);
 const MODES = new Set(['recall', 'browse']);
+const LEVELS = new Set(['all', 'N1', 'N2', 'N3', 'N4', 'N5']);
 const ID_PATTERN = /^[a-f0-9]{10}$/;
 
 export function cleanRecords(records) {
@@ -13,8 +14,10 @@ export function cleanRecords(records) {
     }]));
 }
 
-function selectDeck(cards, records, filter) {
-  return cards.filter(({ id }) => {
+function selectDeck(cards, records, filter, level) {
+  return cards.filter(card => {
+    if (level !== 'all' && card.level !== level) return false;
+    const { id } = card;
     const record = records[id] ?? {};
     if (filter === 'marked') return record.meaning || record.reading || record.unknown;
     if (filter === 'meaning') return record.meaning;
@@ -27,10 +30,11 @@ function selectDeck(cards, records, filter) {
 export function createState(cards, saved = {}) {
   const mode = MODES.has(saved?.mode) ? saved.mode : 'recall';
   const filter = FILTERS.has(saved?.filter) ? saved.filter : 'all';
+  const level = LEVELS.has(saved?.level) ? saved.level : 'all';
   const records = cleanRecords(saved?.records);
-  const deck = selectDeck(cards, records, filter);
+  const deck = selectDeck(cards, records, filter, level);
   return {
-    cards, records, mode, filter, deck,
+    cards, records, mode, filter, level, deck,
     index: Math.max(0, deck.findIndex(({ id }) => id === saved?.currentId)),
     revealed: mode === 'browse',
     complete: false,
@@ -54,7 +58,16 @@ export function setFilter(state, filter) {
   return {
     ...state, filter,
     // Freeze this round's membership so clearing a flag cannot remove the card mid-review.
-    deck: selectDeck(state.cards, state.records, filter),
+    deck: selectDeck(state.cards, state.records, filter, state.level),
+    index: 0, complete: false, revealed: state.mode === 'browse',
+  };
+}
+
+export function setLevel(state, level) {
+  if (!LEVELS.has(level)) return state;
+  return {
+    ...state, level,
+    deck: selectDeck(state.cards, state.records, state.filter, level),
     index: 0, complete: false, revealed: state.mode === 'browse',
   };
 }
@@ -85,7 +98,9 @@ export function previousCard(state) {
 }
 
 export function summary(state) {
-  const records = state.cards.map(({ id }) => state.records[id] ?? {});
+  const records = state.cards
+    .filter(card => state.level === 'all' || card.level === state.level)
+    .map(({ id }) => state.records[id] ?? {});
   return {
     meaning: records.filter(record => record.meaning).length,
     reading: records.filter(record => record.reading).length,
@@ -96,7 +111,7 @@ export function summary(state) {
 
 export function serialize(state) {
   return {
-    version: 1, mode: state.mode, filter: state.filter,
+    version: 1, mode: state.mode, filter: state.filter, level: state.level,
     currentId: currentCard(state)?.id ?? null,
     records: state.records,
   };

@@ -55,6 +55,11 @@ OpenJLPT rebuilds from upstream monthly (`.github/workflows/update-data.yml`), a
 
 ## Korean vocabulary modifications (2026-10-16)
 
-This app adds independently written Korean core-meaning summaries for all 3,070 N1 entries in the OpenJLPT 0.3.0 snapshot. Source IDs, Japanese spellings and supplied readings are unchanged. AI-assisted authorship and a second semantic review compared the source fields; dictionary checks were selective. These summaries cover selected senses, not every usage. The Korean additions are licensed under CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/
+This app adds independently written Korean core-meaning summaries for all 7,811 N1–N5 entries in the OpenJLPT 0.3.0 snapshot (N1: 3070, N2: 1778, N3: 1659, N4: 630, N5: 674). Source IDs, Japanese spellings and supplied readings are unchanged. AI-assisted authorship and a second semantic review compared the source fields; dictionary checks were selective. These summaries cover selected senses, not every usage. The Korean additions are licensed under CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/
 
-Original vocabulary SHA-256: 09325eb676ec26044e9019afb5ddd460a394a0d8cb51b0b34d30d03124c131ff.
+Original vocabulary SHA-256:
+- N1: 09325eb676ec26044e9019afb5ddd460a394a0d8cb51b0b34d30d03124c131ff
+- N2: 4c7053d1b61f71ca4004252cafdf89439c65531900e7bab6c53078802acf3c5b
+- N3: 17ca6bcbba9d212c3c9d38c38cecc2adef0fd8718cb7157bb48dd9d3a1724948
+- N4: b38512a6dc1e06a3615f377b3e58184c4a85b6f769c2e3f58f2a4ef0e1810927
+- N5: cbb221c9a3a92108fcd02fb088d9afacc70bc8c96570d5730425de0a49dad5f3

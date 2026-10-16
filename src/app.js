@@ -1,4 +1,4 @@
-import { createState, currentCard, nextCard, previousCard, reveal, setFilter, setMode, summary, toggleFlag, serialize } from './review.js';
+import { createState, currentCard, nextCard, previousCard, reveal, setFilter, setLevel, setMode, summary, toggleFlag, serialize } from './review.js';
 import { loadSaved, saveReview } from './storage.js';
 
 const $ = id => document.getElementById(id);
@@ -34,13 +34,14 @@ function render() {
   const complete = state.complete && !empty;
   const counts = summary(state);
   $('filter').value = state.filter;
+  $('level').value = state.level;
   $('mode-recall').setAttribute('aria-pressed', String(state.mode === 'recall'));
   $('mode-browse').setAttribute('aria-pressed', String(state.mode === 'browse'));
   $('total').textContent = String(state.deck.length).padStart(2, '0');
   $('position').textContent = empty ? '00' : String(state.index + 1).padStart(2, '0');
   $('progress').max = Math.max(1, state.deck.length);
   $('progress').value = empty ? 0 : complete ? state.deck.length : state.index + 1;
-  $('deck-label').textContent = state.filter === 'all' ? '나의 N1 단어장' : $('filter').selectedOptions[0].textContent;
+  $('deck-label').textContent = `${state.level === 'all' ? '전체 급수' : state.level} · ${$('filter').selectedOptions[0].textContent}`;
   $('word-card').hidden = empty || complete;
   $('empty-state').hidden = !empty;
   $('complete-state').hidden = !complete;
@@ -54,6 +55,8 @@ function render() {
   if (!card || complete) return;
 
   const record = state.records[card.id] ?? {};
+  $('level-tag').textContent = card.level;
+  $('level-tag').setAttribute('aria-label', `단어 급수 ${card.level}`);
   $('word').textContent = card.word;
   $('dictionary-link').href = `https://ja.dict.naver.com/#/search?query=${encodeURIComponent(card.word)}&range=all`;
   $('dictionary-link').setAttribute('aria-label', `${card.word} 네이버 일본어 사전에서 검색 (새 탭)`);
@@ -101,6 +104,7 @@ function attachEvents() {
   $('mode-recall').addEventListener('click', () => update(setMode(state, 'recall')));
   $('mode-browse').addEventListener('click', () => update(setMode(state, 'browse')));
   $('filter').addEventListener('change', event => update(setFilter(state, event.target.value)));
+  $('level').addEventListener('change', event => update(setLevel(state, event.target.value)));
   $('empty-all').addEventListener('click', () => update(setFilter(state, 'all')));
   $('review-marked').addEventListener('click', () => update(setFilter(state, 'marked')));
   $('restart').addEventListener('click', () => update(setFilter(state, state.filter)));
@@ -173,7 +177,7 @@ async function start() {
     if (!Array.isArray(data.cards) || data.cards.length === 0) throw new Error('No reviewed vocabulary.');
     const restored = loadSaved(storage);
     state = createState(data.cards, restored.saved);
-    $('dataset-info').textContent = `OpenJLPT N1 목록 전체 ${data.cards.length.toLocaleString('ko-KR')}개 단어가 들어 있어요. 짧은 한국어 핵심 뜻으로 복습하고, 자세한 용법은 카드의 사전 버튼으로 확인할 수 있어요.`;
+    $('dataset-info').textContent = `OpenJLPT N1~N5 목록 전체 ${data.cards.length.toLocaleString('ko-KR')}개 단어가 들어 있어요. 짧은 한국어 핵심 뜻으로 복습하고, 자세한 용법은 카드의 사전 버튼으로 확인할 수 있어요.`;
     if (!restored.available) $('save-note').textContent = '저장된 기록을 읽을 수 없어요. 지금 창에서는 복습할 수 있어요.';
     $('load-message').hidden = true;
     $('review-app').hidden = false;

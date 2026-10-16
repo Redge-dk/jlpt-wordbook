@@ -43,6 +43,9 @@ select { appearance: none; background: transparent; padding: 0 29px 0 2px; borde
 .mode-switch button { min-height: 35px; padding: 0 14px; border: 0; background: transparent; border-radius: 7px; font-size: 11px; color: #788171; white-space: nowrap; transition: background .18s, color .18s; }
 .mode-switch button[aria-pressed="true"] { background: var(--card); color: var(--green); box-shadow: 0 1px 4px #243d2410; font-weight: 600; }
 .progress-row { display: flex; justify-content: space-between; align-items: baseline; color: #7c8478; font-size: 11px; letter-spacing: .015em; margin-bottom: 11px; }
+.level-filter-wrap { min-width: 90px; }
+.level-filter-wrap select { min-height: 36px; font-size: 11px; }
+.level-filter-wrap::after { top: 14px; }
 .counter { font-variant-numeric: tabular-nums; letter-spacing: .02em; color: #9ca391; font-size: 12px; }
 .counter strong { color: var(--green); font-size: 16px; font-weight: 550; }
 .counter > span:first-of-type { margin: 0 5px; }
